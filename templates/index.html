@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Esports Club - Official Arena</title>
+  <title>VaZra GameVerse</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 </head>
 <body>
@@ -15,12 +15,12 @@
   <header class="navbar">
     <div class="logo">
       <img src="{{ url_for('static', filename='vazra-logo.png') }}" alt="VaZra Logo" class="nav-logo-img" />
-      VaZra 
+      VaZra
     </div>
     <nav>
       <a href="#bgmi-section">BGMI</a>
-      <a href="#freefire-section">Free Fire</a>
-      <a href="#rulebook">Rulebook</a>
+      <a href="#freefire-section">FREE FIRE</a>
+      <a href="#rulebook">RULEBOOK</a>
     </nav>
   </header>
 
@@ -38,7 +38,7 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-live-badge"><span class="pulse-dot"></span> REGISTRATIONS OPEN</div>
-    <h1>VaZra<br>GameVerse</h1>
+    <h1>VAZRA<br>GAMEVERSE</h1>
     
     <div class="hero-perk-note">
       <div class="hero-perk-header">
@@ -52,95 +52,137 @@
     <div class="ff-hazard-stripe"></div>
   </section>
 
-  <!-- Arena Container with Posters -->
+  <!-- Arena Container with Game Showcase Cards -->
   <div class="arena-container">
     
-    <!-- BGMI Showcase Card (LOCKED) -->
-    <section id="bgmi-section" class="game-showcase-card is-locked">
+    <!-- 1. FIRST GAME: Free Fire Showcase Card (Left Position) -->
+    <section id="freefire-section" class="game-showcase-card {% if reg_status.freefire %}is-open{% else %}is-locked{% endif %}">
       <div class="card-media-wrap">
-        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="BGMI Tournament" class="card-poster" />
-        <div class="poster-overlay-tag locked-overlay">LAUNCHING SOON</div>
+        <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Free Fire Tournament" class="card-poster" />
+        {% if reg_status.freefire %}
+          <div class="poster-overlay-tag open-overlay">🔥 SLOTS OPEN</div>
+        {% else %}
+          <div class="poster-overlay-tag locked-overlay">SEATS FULL</div>
+        {% endif %}
       </div>
 
       <div class="card-body">
         <div class="card-top-bar">
-          <span class="badge-tag">Battle Royale</span>
-          <span class="status-pill coming-soon-pill">⏳ STARTS SOON</span>
+          <span class="badge-tag">FAST PACED</span>
+          {% if reg_status.freefire %}
+            <span class="status-pill open-live-pill"><span class="live-dot"></span> REGISTRATION OPEN</span>
+          {% else %}
+            <span class="status-pill coming-soon-pill" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4);">🚫 REGISTRATION CLOSED</span>
+          {% endif %}
         </div>
-        <h2>BATTLEGROUNDS MOBILE INDIA</h2>
+        <h1>FREE FIRE MAX</h1>
+        <h2>TOURNAMENT : CHAMPION SERIES</h2>
         <p class="showcase-desc">
-          Lobby configuration and slot allocation are currently being finalized. Registrations will unlock shortly—stay tuned to the club group!
+          {% if reg_status.freefire %}
+            Official Bermuda clash squad and survival showdown. Fast reflexes and precise Aim.
+          {% else %}
+            All custom room slots for this fixture have been claimed! Room details will be posted in the official WhatsApp group.
+          {% endif %}
         </p>
 
         <div class="specs-grid">
           <div class="spec-item">
-            <span class="spec-label">Format</span>
+            <span class="spec-label">FORMAT</span>
+            <span class="spec-value">Clash Squad [1v1]</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">MAP</span>
+            <span class="spec-value">All Map</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">STATUS</span>
+            <span class="spec-value" style="color: {% if reg_status.freefire %}#00aa44{% else %}#EF4444{% endif %};">
+              {% if reg_status.freefire %}● Live Now{% else %}● Locked{% endif %}
+            </span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">ENTRY FEE</span>
+            <span class="spec-value">₹50 Per Player</span>
+          </div>
+        </div>
+
+        {% if reg_status.freefire %}
+          <a href="/register/freefire" class="btn-ff-action">
+            REGISTER FOR CHAMPION SERIES »
+          </a>
+        {% else %}
+          <button type="button" class="btn-ff-action btn-disabled" disabled>
+            🔒 REGISTRATION FULL
+          </button>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- 2. SECOND GAME: BGMI Showcase Card (Right Position) -->
+    <section id="bgmi-section" class="game-showcase-card {% if reg_status.bgmi %}is-open{% else %}is-locked{% endif %}">
+      <div class="card-media-wrap">
+        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="BGMI Tournament" class="card-poster" />
+        {% if reg_status.bgmi %}
+          <div class="poster-overlay-tag open-overlay">🔥 SLOTS OPEN</div>
+        {% else %}
+          <div class="poster-overlay-tag locked-overlay">LAUNCHING SOON</div>
+        {% endif %}
+      </div>
+
+      <div class="card-body">
+        <div class="card-top-bar">
+          <span class="badge-tag">BATTLE ROYALE</span>
+          {% if reg_status.bgmi %}
+            <span class="status-pill open-live-pill"><span class="live-dot"></span> REGISTRATION OPEN</span>
+          {% else %}
+            <span class="status-pill coming-soon-pill">⏳ STARTS SOON</span>
+          {% endif %}
+        </div>
+        <h2>BATTLEGROUNDS MOBILE INDIA</h2>
+        <p class="showcase-desc">
+          {% if reg_status.bgmi %}
+            Official Erangel squad showdown. Lock in your team roster and prepare for the drop!
+          {% else %}
+            Lobby configuration and slot allocation are currently being finalized. Registrations will unlock shortly—stay tuned to the club group!
+          {% endif %}
+        </p>
+
+        <div class="specs-grid">
+          <div class="spec-item">
+            <span class="spec-label">FORMAT</span>
             <span class="spec-value">Squad (TPP)</span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">Map</span>
+            <span class="spec-label">MAP</span>
             <span class="spec-value">Erangel</span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">Status</span>
-            <span class="spec-value" style="color: #ff5500;">Locked</span>
+            <span class="spec-label">STATUS</span>
+            <span class="spec-value" style="color: {% if reg_status.bgmi %}#00aa44{% else %}#ff5500{% endif %};">
+              {% if reg_status.bgmi %}● Live Now{% else %}Locked{% endif %}
+            </span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">Platform</span>
+            <span class="spec-label">PLATFORM</span>
             <span class="spec-value">Mobile Only</span>
           </div>
         </div>
 
-        <button type="button" class="btn-ff-action btn-disabled" disabled>
-          🔒 REGISTRATION OPENS SOON
-        </button>
+        {% if reg_status.bgmi %}
+          <a href="/register/bgmi" class="btn-ff-action">
+            REGISTER FOR BGMI »
+          </a>
+        {% else %}
+          <button type="button" class="btn-ff-action btn-disabled" disabled>
+            🔒 REGISTRATION OPENS SOON
+          </button>
+        {% endif %}
       </div>
     </section>
 
-    <!-- Free Fire Showcase Card (CLOSED - SEATS FULL) -->
-    <section id="freefire-section" class="game-showcase-card is-locked">
-      <div class="card-media-wrap">
-        <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Free Fire Tournament" class="card-poster" />
-        <div class="poster-overlay-tag locked-overlay">SEATS FULL</div>
-      </div>
-
-      <div class="card-body">
-        <div class="card-top-bar">
-          <span class="badge-tag">Fast Paced</span>
-          <span class="status-pill coming-soon-pill" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4);">🚫 REGISTRATIONS CLOSED</span>
-        </div>
-        <h2>FREE FIRE MAX</h2>
-        <p class="showcase-desc">
-          All tournament slots for this fixture have been claimed! Slot lists and custom room details will be posted in the official WhatsApp group.
-        </p>
-
-        <div class="specs-grid">
-          <div class="spec-item">
-            <span class="spec-label">Format</span>
-            <span class="spec-value">Solo (1v1)</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Map</span>
-            <span class="spec-value">Bermuda</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Status</span>
-            <span class="spec-value" style="color: #EF4444;">● Housefull</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Entry Fee</span>
-            <span class="spec-value">₹25 per person</span>
-          </div>
-        </div>
-
-        <button type="button" class="btn-ff-action btn-disabled" disabled>
-          🚫 REGISTRATION FULL
-        </button>
-      </div>
-    </section>
   </div>
 
-  <!-- Official Rulebook & Scoring -->
+  <!-- Official Rulebook & Scoring Section -->
   <section id="rulebook" class="rulebook-section">
     <div class="section-heading-wrap">
       <h2>OFFICIAL RULES & SCORING</h2>
@@ -154,38 +196,28 @@
           <li><strong>No Emulators:</strong> iPads, tablets, and PC emulators are strictly prohibited. Standard smartphones only.</li>
           <li><strong>Room Access:</strong> Custom Room ID & Password will be distributed on the official WhatsApp group 15 minutes prior to match launch.</li>
           <li><strong>Zero Tolerance:</strong> Third-party configs, scripts, or unfair teaming up results in an immediate permanent ban.</li>
-          <li><strong>Match Result:</strong> Team leader must take an end-game screenshot displaying team placements and kill counts.</li>
         </ul>
       </div>
+
       <div class="rule-card">
         <h3>🏆 SCORING SYSTEM</h3>
         <table class="scoring-table">
           <thead>
             <tr>
-              <th>Placement</th>
-              <th>Prizes</th>
-              <th>Per Kill Prizes</th>
+              <th>PLACEMENT</th>
+              <th>PRIZES</th>
+              <th>PER KILL PRIZES</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>#1 Winner (Booyah / WWCD)</td>
-              <td>200 Rupees</td>
-              <td>10 Rupees / Kill</td>
+              <td style="color: #ffaa00; font-weight: bold;">200 Rupees</td>
+              <td style="color: #ffaa00; font-weight: bold;">10 Rupees / Kill</td>
             </tr>
             <tr>
               <td>#2 Runner-Up</td>
               <td>100 Rupees</td>
-              <td>10 Rupees / Kill</td>
-            </tr>
-            <tr>
-              <td>#3 Third Place</td>
-              <td>50 Rupees</td>
-              <td>10 Rupees / Kill</td>
-            </tr>
-            <tr>
-              <td>Apex Killer (Highest Kill Count)</td>
-              <td>-</td>
               <td>10 Rupees / Kill</td>
             </tr>
           </tbody>
@@ -195,17 +227,17 @@
   </section>
 
   <!-- About Us Section -->
-  <div class="card-about-section" style="max-width: 1000px; margin: 3rem auto; padding: 2rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(0, 255, 204, 0.2); border-radius: 12px; text-align: center;">
-    <h1 style="color: #00ffcc; margin-bottom: 1rem;">About VaZra GameVerse</h1>
-    <p style="color: #cbd5e1; line-height: 1.6;">
-      <strong>VaZra GameVerse</strong> is a growing esports and gaming community at <strong>ABES</strong>, built to bring gamers together to <strong>connect, compete, and grow</strong>. We organize regular tournaments across popular games like <span class="highlight-game">Free Fire MAX</span>, <span class="highlight-game">BGMI</span>, <span class="highlight-game">Valorant</span>, and more, giving players a platform to showcase their skills, compete for <strong>exciting rewards</strong>, and become part of a competitive gaming community.
+  <div class="card-about-section">
+    <h1>ABOUT VAZRA GAMEVERSE</h1>
+    <p>
+      <strong>VaZra GameVerse</strong> is a growing esports and gaming community built to bring gamers together to connect, compete, and grow.
+      We organize regular tournaments across popular games like <span class="highlight-game">Free Fire MAX</span>, <span class="highlight-game">BGMI</span>, <span class="highlight-game">Valorant</span>, and more, giving players a platform to showcase their skills, compete for exciting rewards, and become part of a competitive gaming community.
     </p>
-    <p class="community-tagline" style="color: #00ffcc; font-weight: bold; margin-top: 1rem;">Play. Compete. Belong.</p>
+    <p class="community-tagline">PLAY. COMPETE. BELONG.</p>
   </div>
 
   <footer>
-    <p>© VaZra GameVerse <br>
-       A community built for gamers who want to <strong>CONNECT • COMPETE • CONQUER</strong></p>
+    <p>© VaZra GameVerse <br> A community built for gamers who want to <strong>CONNECT • COMPETE • CONQUER</strong></p>
   </footer>
 
 </body>

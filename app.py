@@ -3,7 +3,6 @@ import datetime
 import traceback
 import requests
 from flask import Flask, render_template, request, redirect, url_for, flash
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "esports_club_key"
@@ -17,93 +16,134 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # -------------------------------------------------------------
-# CONFIGURATION
+# CONFIGURATION & AUTOMATION SETTINGS
 # -------------------------------------------------------------
 GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbw7clzvcXxn36IF0CREgdUy0dtdgBtDzt8fO8mekpWR24egbqH5-3-cehqlGmy0ku_F/exec"
-IMGBB_API_KEY = "60952399b196ee3750f4ee2c50a9ad4f"
 
 # Define IST Timezone (UTC + 5:30)
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 
+# Slot Limits per game
+SLOT_LIMITS = {
+    'freefire': 48,  # Total solo slots for 1v1 custom room
+    'bgmi': 20       # Max squad slots
+}
+
+# Manual Fallback Status (True = Allowed to open, False = Force Closed)
+MANUAL_REGISTRATION_STATUS = {
+    'freefire': True,
+    'bgmi': False
+}
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_dynamic_status():
+    """
+    Queries Google Apps Script (doGet) to fetch current row counts.
+    Automatically switches status to False if slot limits are reached.
+    """
+    status = MANUAL_REGISTRATION_STATUS.copy()
+    
+    # Skip network check if Free Fire is manually turned off
+    if not status['freefire']:
+        return status
+
+    try:
+        response = requests.get(GOOGLE_SHEET_WEBHOOK_URL, allow_redirects=True, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            total_registered = data.get('total_registrations', 0)
+            
+            # Auto-close if registrations reach or exceed limit
+            if total_registered >= SLOT_LIMITS['freefire']:
+                status['freefire'] = False
+                print(f"[AUTO-CLOSE] Free Fire seats full: {total_registered}/{SLOT_LIMITS['freefire']}")
+            else:
+                print(f"[SLOT STATUS] Free Fire: {total_registered}/{SLOT_LIMITS['freefire']} registered.")
+    except Exception as e:
+        print(f"[WARNING] Could not fetch Google Sheet row count: {e}")
+        
+    return status
 
 # Route 1: Home Page
 @app.route('/')
 def home():
-    return render_template('index.html')
+    current_status = get_dynamic_status()
+    return render_template('index.html', reg_status=current_status)
 
 # Route 2: Dedicated registration pages for BGMI and Free Fire
 @app.route('/register/<game_type>')
 def register_page(game_type):
-    game_type = game_type.lower()
-    if game_type == 'bgmi':
+    game_slug = game_type.lower()
+    
+    # Normalize slug
+    if game_slug in ['freefire', 'free-fire']:
+        key = 'freefire'
+        game_title = "Free Fire MAX (1v1)"
+        bg_class = "ff-bg"
+    elif game_slug == 'bgmi':
+        key = 'bgmi'
         game_title = "BGMI (Battlegrounds Mobile India)"
         bg_class = "bgmi-bg"
-    elif game_type in ['freefire', 'free-fire']:
-        game_title = "Free Fire MAX"
-        bg_class = "ff-bg"
     else:
         return redirect(url_for('home'))
-        
-    return render_template('register.html', game_title=game_title, bg_class=bg_class, game_slug=game_type)
+
+    current_status = get_dynamic_status()
+
+    # Security Guard: Block page access if registrations are closed or full
+    if not current_status.get(key, False):
+        flash(f"Registrations for {game_title} are currently closed or full!")
+        return redirect(url_for('home'))
+
+    return render_template('register.html', game_title=game_title, bg_class=bg_class, game_slug=key)
 
 # Route 3: Success Confirmation Page
 @app.route('/success')
 def success_page():
     return render_template('success.html')
 
-# Route 4: Form submission handler
+# Route 4: Form submission handler (Updated for 1v1 Custom Room)
 @app.route('/submit-registration', methods=['POST'])
 def submit_registration():
-    game = request.form.get('game')
-    team_name = request.form.get('team_name')
-    full_name = request.form.get('name')
-    admission_no = request.form.get('admission_no')
-    branch = request.form.get('branch')
+    game_slug = request.form.get('game_slug', 'freefire').lower()
+    key = 'freefire' if game_slug in ['freefire', 'free-fire'] else 'bgmi'
+
+    current_status = get_dynamic_status()
+
+    # Security Guard: Reject POST request if registration is closed or full
+    if not current_status.get(key, False):
+        flash("Registrations are closed or seats are full. Submission rejected.")
+        return redirect(url_for('home'))
+
+    # Extract all 8 fields submitted from register.html
+    game = request.form.get('game', 'Free Fire MAX (1v1)')
+    player_name = request.form.get('name')
+    in_game_username = request.form.get('in_game_username')
     in_game_id = request.form.get('in_game_id')
+    section = request.form.get('section')
+    admission_no = request.form.get('admission_no')
     contact = request.form.get('contact')
     utr_id = request.form.get('utr_id')
-    game_slug = request.form.get('game_slug', 'freefire')
 
-    # Get uploaded file
-    file = request.files.get('payment_screenshot')
-    if not file or file.filename == '':
-        screenshot_url = "No Image Uploaded"
-    else:
+    # Read direct ImgBB URL generated by client-side JavaScript
+    screenshot_url = request.form.get('screenshot_url')
+    if not screenshot_url:
         screenshot_url = "Cloud Upload Failed - Check UTR"
-        try:
-            file_bytes = file.read()
-            response = requests.post(
-                "https://api.imgbb.com/1/upload",
-                data={"key": IMGBB_API_KEY},
-                files={"image": (file.filename, file_bytes)},
-                timeout=15
-            )
-            
-            if response.status_code == 200:
-                res_json = response.json()
-                if res_json.get("success"):
-                    screenshot_url = res_json["data"]["url"]
-                else:
-                    print("ImgBB Rejected Upload:", res_json)
-            else:
-                print(f"ImgBB HTTP Error Status {response.status_code}: {response.text}")
-        except Exception as e:
-            print(f"Exception during ImgBB upload on Render: {e}")
 
     # Generate accurate Indian Standard Time (IST)
     timestamp = datetime.datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
 
-    # Prepare data payload for Google Sheets
+    # Prepare data payload for Google Sheets matching the new column order
     payload = {
         "timestamp": timestamp,
         "game": game,
-        "team_name": team_name,
-        "full_name": full_name,
-        "admission_no": admission_no,
-        "branch": branch,
+        "player_name": player_name,
+        "in_game_username": in_game_username,
         "in_game_id": in_game_id,
+        "section": section,
+        "admission_no": admission_no,
         "contact": contact,
         "utr_id": utr_id,
         "screenshot_url": screenshot_url
@@ -116,16 +156,15 @@ def submit_registration():
         print("Google Sheet Response Text:", sheet_response.text)
         
         if sheet_response.status_code == 200:
-            # Successfully logged to Google Sheets -> Redirect to Success Page
             return redirect(url_for('success_page'))
         else:
-            flash("Registration data recorded, but sheet sync returned an error.")
+            flash("Registration recorded, but Google Sheets sync returned an error.")
     except Exception as e:
         traceback.print_exc()
         print(f"Error syncing to Google Sheets: {e}")
         flash(f"Server error during registration sync: {e}")
 
-    return redirect(url_for('register_page', game_type=game_slug))
+    return redirect(url_for('register_page', game_type=key))
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

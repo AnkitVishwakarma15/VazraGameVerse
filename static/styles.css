@@ -302,7 +302,7 @@ body {
   clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
 }
 
-.game-showcase-card h2 {
+.game-showcase-card h1 {
   font-family: 'Teko', sans-serif;
   font-size: 2.4rem;
   line-height: 1.05;
