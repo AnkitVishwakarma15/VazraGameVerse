@@ -100,7 +100,7 @@ const Register = () => {
     setErrorMsg('');
 
     try {
-      await axios.post('http://localhost:5001/api/register', {
+      await axios.post('https://vazragameverse-1.onrender.com/api/register', {
         ...formData,
         game_slug: gameSlug,
         game: gameTitle,

@@ -9,7 +9,9 @@ const Home = () => {
     // Fetch dynamic status from the backend
     const fetchStatus = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/status');
+        const response = await axios.get(
+          "https://vazragameverse-1.onrender.com/api/status",
+        );
         setRegStatus(response.data);
       } catch (error) {
         console.error('Error fetching status', error);
