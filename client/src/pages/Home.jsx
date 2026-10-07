@@ -120,7 +120,7 @@ const Home = () => {
                     border: "1px solid rgba(239, 68, 68, 0.4)",
                   }}
                 >
-                  🚫 Registration Closed
+                  🚫 Coming Soon...
                 </span>
               )}
             </div>
@@ -258,7 +258,7 @@ const Home = () => {
                 className="btn-ff-action btn-disabled"
                 disabled
               >
-                🔒 REGISTRATION CLOSED
+                🔒 Coming Soon...
               </button>
             )}
           </div>
