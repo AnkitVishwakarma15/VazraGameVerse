@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Home = () => {
-  const [regStatus, setRegStatus] = useState({ freefire: false, bgmi: false });
+  // Option 2: Split Free Fire into separate tournament keys with Battle Series turned off by default
+  const [regStatus, setRegStatus] = useState({
+    freefireChampion: true,
+    freefireBattle: false, // OFF / Closed
+    bgmi: false,
+  });
+
   const [trueStatus, setTrueStatus] = useState(true);
+
   useEffect(() => {
     // Fetch dynamic status from the backend
     const fetchStatus = async () => {
@@ -12,9 +19,15 @@ const Home = () => {
         const response = await axios.get(
           "https://vazragameverse-1.onrender.com/api/status",
         );
-        setRegStatus(response.data);
+        // Map backend response while keeping Battle Series off
+        setRegStatus({
+          freefireChampion:
+            response.data?.freefireChampion ?? response.data?.freefire ?? true,
+          freefireBattle: response.data?.freefireBattle ?? false, // Kept off unless backend explicitly dictates otherwise
+          bgmi: response.data?.bgmi ?? false,
+        });
       } catch (error) {
-        console.error('Error fetching status', error);
+        console.error("Error fetching status", error);
       }
     };
     fetchStatus();
@@ -28,7 +41,11 @@ const Home = () => {
       {/* Navbar */}
       <header className="navbar">
         <div className="logo">
-          <img src="/vazra-logo.png" alt="VaZra Logo" className="nav-logo-img" />
+          <img
+            src="/vazra-logo.png"
+            alt="VaZra Logo"
+            className="nav-logo-img"
+          />
           VaZra
         </div>
         <nav>
@@ -40,7 +57,9 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="hero">
-        <div className="hero-live-badge"><span className="pulse-dot"></span> REGISTRATIONS OPEN</div>
+        <div className="hero-live-badge">
+          <span className="pulse-dot"></span> REGISTRATIONS OPEN
+        </div>
         <h1>VAZRA GAMEVERSE</h1>
 
         <div className="hero-perk-note">
@@ -48,24 +67,40 @@ const Home = () => {
             <span className="perk-lightning">⚡</span>
             <h4>CHAMPION PRIVILEGE</h4>
           </div>
-          <p>Winners get <strong>free entry into the next tournament</strong> to defend their crown and claim back-to-back glory!</p>
+          <p>
+            Winners get <strong>free entry into the next tournament</strong> to
+            defend their crown and claim back-to-back glory!
+          </p>
         </div>
 
-        <p style={{ color: "white" }}>Select your battlefield, lock in your squad roster, and fight for collegiate glory.</p>
+        <p style={{ color: "white" }}>
+          Select your battlefield, lock in your squad roster, and fight for
+          collegiate glory.
+        </p>
         <div className="ff-hazard-stripe"></div>
       </section>
 
       {/* Arena Container with Game Showcase Cards */}
       <div className="arena-container">
-
-        {/* 1. FIRST GAME: Free Fire Showcase Card (Left Position) */}
-        <section id="freefire-section" className={`game-showcase-card ${regStatus.freefire ? 'is-open' : 'is-locked'}`}>
+        {/* 1. FIRST GAME: Free Fire Champion Series (Left Position) */}
+        <section
+          id="freefire-section"
+          className={`game-showcase-card ${regStatus.freefireChampion ? "is-open" : "is-locked"}`}
+        >
           <div className="card-media-wrap">
-            <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Free Fire Tournament" className="card-poster" />
+            <img
+              src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80"
+              alt="Free Fire Tournament"
+              className="card-poster"
+            />
             {trueStatus ? (
-              <div className="poster-overlay-tag open-overlay">🔥 SLOTS OPEN</div>
+              <div className="poster-overlay-tag open-overlay">
+                🔥 SLOTS OPEN
+              </div>
             ) : (
-              <div className="poster-overlay-tag locked-overlay">SEATS FULL</div>
+              <div className="poster-overlay-tag locked-overlay">
+                SEATS FULL
+              </div>
             )}
           </div>
 
@@ -73,9 +108,20 @@ const Home = () => {
             <div className="card-top-bar">
               <span className="badge-tag">FREE FIRE</span>
               {trueStatus ? (
-                <span className="status-pill open-live-pill"><span className="live-dot"></span> REGISTRATION OPEN</span>
+                <span className="status-pill open-live-pill">
+                  <span className="live-dot"></span> REGISTRATION OPEN
+                </span>
               ) : (
-                <span className="status-pill coming-soon-pill" style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.4)' }}>🚫 REGISTRATION CLOSED</span>
+                <span
+                  className="status-pill coming-soon-pill"
+                  style={{
+                    background: "rgba(239, 68, 68, 0.2)",
+                    color: "#EF4444",
+                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                  }}
+                >
+                  🚫 REGISTRATION CLOSED
+                </span>
               )}
             </div>
             <h1>FREE FIRE MAX</h1>
@@ -97,7 +143,10 @@ const Home = () => {
               </div>
               <div className="spec-item">
                 <span className="spec-label">STATUS</span>
-                <span className="spec-value" style={{ color: trueStatus ? '#00aa44' : '#EF4444' }}>
+                <span
+                  className="spec-value"
+                  style={{ color: trueStatus ? "#00aa44" : "#EF4444" }}
+                >
                   {trueStatus ? "● Live Now" : "● Locked"}
                 </span>
               </div>
@@ -112,37 +161,63 @@ const Home = () => {
                 REGISTER FOR CHAMPION SERIES »
               </Link>
             ) : (
-              <button type="button" className="btn-ff-action btn-disabled" disabled>
+              <button
+                type="button"
+                className="btn-ff-action btn-disabled"
+                disabled
+              >
                 🔒 REGISTRATION FULL
               </button>
             )}
           </div>
         </section>
 
-        {/* 2. SECOND GAME: Free Fire Showcase Card */}
-        <section id="freefire-section" className={`game-showcase-card ${regStatus.freefire ? 'is-open' : 'is-locked'}`}>
+        {/* 2. SECOND GAME: Free Fire Battle Series (Turned Off) */}
+        <section
+          id="freefire-battle-section"
+          className={`game-showcase-card ${regStatus.freefireBattle ? "is-open" : "is-locked"}`}
+        >
           <div className="card-media-wrap">
-            <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Free Fire Tournament" className="card-poster" />
-            {regStatus.freefire ? (
-              <div className="poster-overlay-tag open-overlay">🔥 SLOTS OPEN</div>
+            <img
+              src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80"
+              alt="Free Fire Tournament"
+              className="card-poster"
+            />
+            {regStatus.freefireBattle ? (
+              <div className="poster-overlay-tag open-overlay">
+                🔥 SLOTS OPEN
+              </div>
             ) : (
-              <div className="poster-overlay-tag locked-overlay">Currently Closed</div>
+              <div className="poster-overlay-tag locked-overlay">
+                Currently Closed
+              </div>
             )}
           </div>
 
           <div className="card-body">
             <div className="card-top-bar">
               <span className="badge-tag">Free Fire</span>
-              {regStatus.freefire ? (
-                <span className="status-pill open-live-pill"><span className="live-dot"></span> REGISTRATION OPEN</span>
+              {regStatus.freefireBattle ? (
+                <span className="status-pill open-live-pill">
+                  <span className="live-dot"></span> REGISTRATION OPEN
+                </span>
               ) : (
-                <span className="status-pill coming-soon-pill" style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.4)' }}>🚫 REGISTRATION CLOSED</span>
+                <span
+                  className="status-pill coming-soon-pill"
+                  style={{
+                    background: "rgba(239, 68, 68, 0.2)",
+                    color: "#EF4444",
+                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                  }}
+                >
+                  🚫 REGISTRATION CLOSED
+                </span>
               )}
             </div>
             <h1>FREE FIRE MAX</h1>
             <h2>TOURNAMENT : BATTLE SERIES</h2>
             <p className="showcase-desc">
-              {regStatus.freefire
+              {regStatus.freefireBattle
                 ? "Official Bermuda survival showdown. Fast reflexes and precise Aim."
                 : "Currently closed!"}
             </p>
@@ -158,8 +233,13 @@ const Home = () => {
               </div>
               <div className="spec-item">
                 <span className="spec-label">STATUS</span>
-                <span className="spec-value" style={{ color: regStatus.freefire ? '#00aa44' : '#EF4444' }}>
-                  {regStatus.freefire ? "● Live Now" : "● Locked"}
+                <span
+                  className="spec-value"
+                  style={{
+                    color: regStatus.freefireBattle ? "#00aa44" : "#EF4444",
+                  }}
+                >
+                  {regStatus.freefireBattle ? "● Live Now" : "● Locked"}
                 </span>
               </div>
               <div className="spec-item">
@@ -168,26 +248,41 @@ const Home = () => {
               </div>
             </div>
 
-            {regStatus.freefire ? (
+            {regStatus.freefireBattle ? (
               <Link to="/register/battleseries" className="btn-ff-action">
                 REGISTER FOR BATTLE SERIES »
               </Link>
             ) : (
-              <button type="button" className="btn-ff-action btn-disabled" disabled>
+              <button
+                type="button"
+                className="btn-ff-action btn-disabled"
+                disabled
+              >
                 🔒 REGISTRATION CLOSED
               </button>
             )}
           </div>
         </section>
 
-        {/* 3. SECOND GAME: BGMI Showcase Card (Right Position) */}
-        <section id="bgmi-section" className={`game-showcase-card ${regStatus.bgmi ? 'is-open' : 'is-locked'}`}>
+        {/* 3. THIRD GAME: BGMI Showcase Card (Right Position) */}
+        <section
+          id="bgmi-section"
+          className={`game-showcase-card ${regStatus.bgmi ? "is-open" : "is-locked"}`}
+        >
           <div className="card-media-wrap">
-            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="BGMI Tournament" className="card-poster" />
+            <img
+              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80"
+              alt="BGMI Tournament"
+              className="card-poster"
+            />
             {regStatus.bgmi ? (
-              <div className="poster-overlay-tag open-overlay">🔥 SLOTS OPEN</div>
+              <div className="poster-overlay-tag open-overlay">
+                🔥 SLOTS OPEN
+              </div>
             ) : (
-              <div className="poster-overlay-tag locked-overlay">LAUNCHING SOON</div>
+              <div className="poster-overlay-tag locked-overlay">
+                LAUNCHING SOON
+              </div>
             )}
           </div>
 
@@ -195,9 +290,13 @@ const Home = () => {
             <div className="card-top-bar">
               <span className="badge-tag">BATTLE ROYALE</span>
               {regStatus.bgmi ? (
-                <span className="status-pill open-live-pill"><span className="live-dot"></span> REGISTRATION OPEN</span>
+                <span className="status-pill open-live-pill">
+                  <span className="live-dot"></span> REGISTRATION OPEN
+                </span>
               ) : (
-                <span className="status-pill coming-soon-pill">⏳ STARTS SOON</span>
+                <span className="status-pill coming-soon-pill">
+                  ⏳ STARTS SOON
+                </span>
               )}
             </div>
             <h2>BATTLEGROUNDS MOBILE INDIA</h2>
@@ -218,7 +317,10 @@ const Home = () => {
               </div>
               <div className="spec-item">
                 <span className="spec-label">STATUS</span>
-                <span className="spec-value" style={{ color: regStatus.bgmi ? '#00aa44' : '#ff5500' }}>
+                <span
+                  className="spec-value"
+                  style={{ color: regStatus.bgmi ? "#00aa44" : "#ff5500" }}
+                >
                   {regStatus.bgmi ? "● Live Now" : "Locked"}
                 </span>
               </div>
@@ -233,13 +335,16 @@ const Home = () => {
                 REGISTER FOR BGMI »
               </Link>
             ) : (
-              <button type="button" className="btn-ff-action btn-disabled" disabled>
+              <button
+                type="button"
+                className="btn-ff-action btn-disabled"
+                disabled
+              >
                 🔒 REGISTRATION OPENS SOON
               </button>
             )}
           </div>
         </section>
-
       </div>
 
       {/* Official Rulebook & Scoring Section */}
@@ -253,9 +358,19 @@ const Home = () => {
           <div className="rule-card">
             <h3>📌 MATCH DIRECTIVES</h3>
             <ul className="rules-list">
-              <li><strong>No Emulators:</strong> iPads, tablets, and PC emulators are strictly prohibited. Standard smartphones only.</li>
-              <li><strong>Room Access:</strong> Custom Room ID & Password will be distributed on the official WhatsApp group 15 minutes prior to match launch.</li>
-              <li><strong>Zero Tolerance:</strong> Third-party configs, scripts, or unfair teaming up results in an immediate permanent ban.</li>
+              <li>
+                <strong>No Emulators:</strong> iPads, tablets, and PC emulators
+                are strictly prohibited. Standard smartphones only.
+              </li>
+              <li>
+                <strong>Room Access:</strong> Custom Room ID & Password will be
+                distributed on the official WhatsApp group 15 minutes prior to
+                match launch.
+              </li>
+              <li>
+                <strong>Zero Tolerance:</strong> Third-party configs, scripts,
+                or unfair teaming up results in an immediate permanent ban.
+              </li>
             </ul>
           </div>
 
@@ -266,19 +381,18 @@ const Home = () => {
                 <tr>
                   <th>PLACEMENT</th>
                   <th>PRIZES</th>
-                  <th>PER KILL PRIZES</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>#1 Winner (Booyah / WWCD)</td>
-                  <td style={{ color: '#ffaa00', fontWeight: 'bold' }}>200 Rupees</td>
-                  <td style={{ color: '#ffaa00', fontWeight: 'bold' }}>10 Rupees / Kill</td>
+                  <td style={{ color: "#ffaa00", fontWeight: "bold" }}>
+                    700 Rupees
+                  </td>
                 </tr>
                 <tr>
                   <td>#2 Runner-Up</td>
-                  <td>100 Rupees</td>
-                  <td>10 Rupees / Kill</td>
+                  <td>300 Rupees</td>
                 </tr>
               </tbody>
             </table>
@@ -290,14 +404,23 @@ const Home = () => {
       <div className="card-about-section">
         <h1>ABOUT VAZRA GAMEVERSE</h1>
         <p>
-          <strong>VaZra GameVerse</strong> is a growing esports and gaming community built to bring gamers together to connect, compete, and grow.
-          We organize regular tournaments across popular games like <span className="highlight-game">Free Fire MAX</span>, <span className="highlight-game">BGMI</span>, <span className="highlight-game">Valorant</span>, and more, giving players a platform to showcase their skills, compete for exciting rewards, and become part of a competitive gaming community.
+          <strong>VaZra GameVerse</strong> is a growing esports and gaming
+          community built to bring gamers together to connect, compete, and
+          grow. We organize regular tournaments across popular games like{" "}
+          <span className="highlight-game">Free Fire MAX</span>,{" "}
+          <span className="highlight-game">BGMI</span>,{" "}
+          <span className="highlight-game">Valorant</span>, and more, giving
+          players a platform to showcase their skills, compete for exciting
+          rewards, and become part of a competitive gaming community.
         </p>
         <p className="community-tagline">PLAY. COMPETE. BELONG.</p>
       </div>
 
       <footer>
-        <p>© VaZra GameVerse <br /> A community built for gamers who want to <strong>CONNECT • COMPETE • CONQUER</strong></p>
+        <p>
+          © VaZra GameVerse <br /> A community built for gamers who want to{" "}
+          <strong>CONNECT • COMPETE • CONQUER</strong>
+        </p>
       </footer>
     </>
   );
