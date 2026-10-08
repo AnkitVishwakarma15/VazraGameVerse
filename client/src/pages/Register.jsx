@@ -171,7 +171,7 @@ const Register = () => {
             </div>
 
             <div className="payment-box">
-              <h4>PAYMENT VERIFICATION (ENTRY FEE: 25/Player)</h4>
+              <h4>PAYMENT VERIFICATION (ENTRY FEE: 50/Player)</h4>
               <p>Scan the official QR code or make a direct transfer to the UPI ID, then upload the receipt screenshot.</p>
 
               <div className="qr-container">
