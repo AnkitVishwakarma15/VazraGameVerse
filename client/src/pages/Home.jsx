@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const Home = () => {
   const [regStatus, setRegStatus] = useState({ freefire: false, bgmi: false });
-  const [trueStatus, setTrueStatus] = useState(true);
+  const [trueStatus] = useState(false);
   useEffect(() => {
     // Fetch dynamic status from the backend
     const fetchStatus = async () => {

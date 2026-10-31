@@ -30,7 +30,7 @@ const SLOT_LIMITS = {
 };
 
 const MANUAL_REGISTRATION_STATUS = {
-  freefire: true,
+  freefire: false,
   bgmi: false,
 };
 

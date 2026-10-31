@@ -21,6 +21,8 @@ const Register = () => {
     navigate('/');
   }
 
+  const registrationClosed = gameSlug === 'freefire' || gameSlug === 'free-fire';
+
   const [formData, setFormData] = useState({
     name: '',
     admission_no: '',
@@ -130,84 +132,96 @@ const Register = () => {
         </div>
       )}
 
+      {registrationClosed && (
+        <div className="flash-container">
+          <div className="flash-box">Registrations for Champion Series are now closed.</div>
+        </div>
+      )}
+
       <section className="register-section">
         <div className="form-wrapper">
           <h1 className="form-title">CHAMPION SERIES [1V1]</h1>
           <p className="form-subtitle">Complete registration to receive Room ID and entry slot.</p>
           <div className="ff-hazard-stripe" style={{ marginBottom: '2rem' }}></div>
 
-          <form onSubmit={handleSubmit} id="registrationForm">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="name">PLAYER NAME (FULL NAME) *</label>
-                <input type="text" id="name" name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="admission_no">ADMISSION NUMBER *</label>
-                <input type="text" id="admission_no" name="admission_no" placeholder="e.g. 2025B0101000" required value={formData.admission_no} onChange={handleChange} />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="in_game_username">IN-GAME USERNAME *</label>
-                <input type="text" id="in_game_username" name="in_game_username" placeholder="IGN / Username" required value={formData.in_game_username} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="in_game_id">FREE FIRE UID *</label>
-                <input type="text" id="in_game_id" name="in_game_id" placeholder="In-game Numeric UID" required value={formData.in_game_id} onChange={handleChange} />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="section">SECTION / BRANCH *</label>
-                <input type="text" id="section" name="section" placeholder="e.g. CSE-13" required value={formData.section} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="contact">WHATSAPP CONTACT *</label>
-                <input type="tel" id="contact" name="contact" placeholder="10-digit number" pattern="[0-9]{10}" required value={formData.contact} onChange={handleChange} />
-              </div>
-            </div>
-
-            <div className="payment-box">
-              <h4>PAYMENT VERIFICATION (ENTRY FEE: 25/Player)</h4>
-              <p>Scan the official QR code or make a direct transfer to the UPI ID, then upload the receipt screenshot.</p>
-
-              <div className="qr-container">
-                <img src="/my-payment-qr.jpg" alt="Payment QR Code" className="qr-img" />
-                <div className="upi-details">
-                  <div className="upi-text">
-                    <span>UPI ID:</span> <strong>yr667721@oksbi</strong>
-                  </div>
-                  <p style={{ color: 'var(--ff-text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>Screenshot must show the complete 12-digit UTR/Ref number.</p>
+          {!registrationClosed ? (
+            <form onSubmit={handleSubmit} id="registrationForm">
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="name">PLAYER NAME (FULL NAME) *</label>
+                  <input type="text" id="name" name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="admission_no">ADMISSION NUMBER *</label>
+                  <input type="text" id="admission_no" name="admission_no" placeholder="e.g. 2025B0101000" required value={formData.admission_no} onChange={handleChange} />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="utr_id">UPI TRANSACTION ID (UTR)*</label>
-                <input type="text" id="utr_id" name="utr_id" placeholder="12-digit UTR" maxLength="16" required value={formData.utr_id} onChange={handleChange} />
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="in_game_username">IN-GAME USERNAME *</label>
+                  <input type="text" id="in_game_username" name="in_game_username" placeholder="IGN / Username" required value={formData.in_game_username} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="in_game_id">FREE FIRE UID *</label>
+                  <input type="text" id="in_game_id" name="in_game_id" placeholder="In-game Numeric UID" required value={formData.in_game_id} onChange={handleChange} />
+                </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="payment_screenshot">UPLOAD PAYMENT RECEIPT SCREENSHOT *</label>
-                <input type="file" id="payment_screenshot" accept="image/*,.pdf" required onChange={previewReceipt} />
-                <small id="upload-status" style={{ display: 'block', marginTop: '6px', fontWeight: 600, color: uploadStatus.includes('✓') ? '#16a34a' : '#0284c7' }}>
-                  {uploadStatus}
-                </small>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="section">SECTION / BRANCH *</label>
+                  <input type="text" id="section" name="section" placeholder="e.g. CSE-13" required value={formData.section} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="contact">WHATSAPP CONTACT *</label>
+                  <input type="tel" id="contact" name="contact" placeholder="10-digit number" pattern="[0-9]{10}" required value={formData.contact} onChange={handleChange} />
+                </div>
+              </div>
 
-                {previewSrc && (
-                  <div id="receiptPreviewContainer" className="preview-container">
-                    <img id="receiptPreview" src={previewSrc} alt="Receipt Preview" />
+              <div className="payment-box">
+                <h4>PAYMENT VERIFICATION (ENTRY FEE: 25/Player)</h4>
+                <p>Scan the official QR code or make a direct transfer to the UPI ID, then upload the receipt screenshot.</p>
+
+                <div className="qr-container">
+                  <img src="/my-payment-qr.jpg" alt="Payment QR Code" className="qr-img" />
+                  <div className="upi-details">
+                    <div className="upi-text">
+                      <span>UPI ID:</span> <strong>yr667721@oksbi</strong>
+                    </div>
+                    <p style={{ color: 'var(--ff-text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>Screenshot must show the complete 12-digit UTR/Ref number.</p>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            <button type="submit" id="submitBtn" className="btn-submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Processing...' : 'Submit Registration »'}
+                <div className="form-group">
+                  <label htmlFor="utr_id">UPI TRANSACTION ID (UTR)*</label>
+                  <input type="text" id="utr_id" name="utr_id" placeholder="12-digit UTR" maxLength="16" required value={formData.utr_id} onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="payment_screenshot">UPLOAD PAYMENT RECEIPT SCREENSHOT *</label>
+                  <input type="file" id="payment_screenshot" accept="image/*,.pdf" required onChange={previewReceipt} />
+                  <small id="upload-status" style={{ display: 'block', marginTop: '6px', fontWeight: 600, color: uploadStatus.includes('✓') ? '#16a34a' : '#0284c7' }}>
+                    {uploadStatus}
+                  </small>
+
+                  {previewSrc && (
+                    <div id="receiptPreviewContainer" className="preview-container">
+                      <img id="receiptPreview" src={previewSrc} alt="Receipt Preview" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button type="submit" id="submitBtn" className="btn-submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Processing...' : 'Submit Registration »'}
+              </button>
+            </form>
+          ) : (
+            <button type="button" className="btn-submit" disabled style={{ opacity: 0.7 }}>
+              REGISTRATION CLOSED
             </button>
-          </form>
+          )}
         </div>
       </section>
 
